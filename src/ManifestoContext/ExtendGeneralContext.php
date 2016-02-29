@@ -32,7 +32,18 @@ protected $reports_path;
             : './';
 
     }
-
+    
+    /**
+      * @BeforeStep
+      */
+     public function beforeStep()
+     {
+	try {
+	  $this->getSession()->getDriver()->resizeWindow(1440,1024,'current');
+	} catch(Exception $e) {
+	  // What can I do if driver doesn't support resizeWindow()? :(
+	}
+     }
 
     /**
      * @AfterStep
