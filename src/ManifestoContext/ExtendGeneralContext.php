@@ -32,7 +32,15 @@ protected $reports_path;
             : './';
 
     }
+    
+    /**
+      * @BeforeStep
+      */
+     public function beforeStep()
+     {
 
+      $this->getSession()->getDriver()->resizeWindow(1440,1024,'current');
+     }
 
     /**
      * @AfterStep
