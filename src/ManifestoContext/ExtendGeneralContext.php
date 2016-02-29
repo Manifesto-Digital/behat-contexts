@@ -41,7 +41,7 @@ protected $reports_path;
 	try {
 	  $this->getSession()->getDriver()->resizeWindow(1440,1024,'current');
 	} catch(Exception $e) {
-	  // What can I do if drivers doesn't support resizeWindow? :(
+	  // What can I do if driver doesn't support resizeWindow()? :(
 	}
      }
 
