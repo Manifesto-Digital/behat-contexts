@@ -11,11 +11,7 @@
   "license": "GPL-2.0",
   "minimum-stability": "dev",
   "require": {
-    "drupal/drupal-extension": "3.0.*",
-    "behat/behat": "3.*",
-    "behat/mink": "1.*",
-    "behat/mink-extension": "2.*",
-    "php": ">=5.3.0"
+    "drupal/drupal-extension": "3.*"
   },
   "autoload": {
     "psr-0": {
