@@ -1,43 +1,47 @@
 <?php
-/**
- * Extends The DrupalContext step-definitions
- *
- * @author Gabriele Maira
- * @version 1.0
- */
 
 namespace ManifestoContext;
 
+use Behat\Mink\Exception\ElementNotFoundException;
 use Drupal\DrupalExtension\Context\RawDrupalContext;
 use Behat\Behat\Context\SnippetAcceptingContext;
 
 use Behat\Behat\Definition\Call;
 
+/**
+ * Extends The DrupalContext step-definitions.
+ *
+ * @author Gabriele Maira <gabriele.maira@manifesto.co.uk>
+ *
+ * @release 1.0
+ */
 class ExtendDrupalContext extends RawDrupalContext implements SnippetAcceptingContext {
 
-
   /**
-   * @var string custom Loggedin path (default /)
+   * Loggedin path (default /).
+   *
+   * @var string custom
    */
   protected $loggedin_path;
 
-
+  /**
+   * ExtendDrupalContext constructor.
+   */
   public function __construct() {
 
-    //redefining where the DrupalContext will check if the user is loggedin
+    // Redefining where the DrupalContext will check if the user is loggedin.
     $this->loggedin_path = (defined('BDD_DRUPAL_LOGGEDIN_PATH'))
       ? BDD_DRUPAL_LOGGEDIN_PATH
       : '/';
   }
 
-
-
   /**
-  * Check logged in status.
-  *
-  * @override RawDrupalContext::loggedIn().
-  * @see https://github.com/jhedstrom/drupalextension/pull/131
-  */
+   * Check logged in status.
+   *
+   * @override RawDrupalContext::loggedIn().
+   *
+   * @see https://github.com/jhedstrom/drupalextension/pull/131
+   */
   public function loggedIn() {
     $session = $this->getSession();
     $session->visit($this->locatePath($this->loggedin_path));
@@ -50,15 +54,15 @@ class ExtendDrupalContext extends RawDrupalContext implements SnippetAcceptingCo
   }
 
   /**
-  * Creates and authenticates a user with the given role(s).
-  *
-  * This extends the basic DrupalContext step/method due the redirect
-  * on Diabetes UK appending the words "on this site"
-  *
-  * @extends DrupalContext::assertAuthenticatedByRole()
-  *
-  * @Given I am logged in as a user with the :role role(s) on this site
-  */
+   * Creates and authenticates a user with the given role(s).
+   *
+   * This extends the basic DrupalContext step/method due the redirect
+   * on Diabetes UK appending the words "on this site"
+   *
+   * @extends DrupalContext::assertAuthenticatedByRole()
+   *
+   * @Given I am logged in as a user with the :role role(s) on this site
+   */
   public function assertAuthenticatedByRoleOnThisSite($role) {
     // Check if a user with this role is already logged in.
     if (!$this->loggedInWithRole($role)) {
@@ -81,18 +85,19 @@ class ExtendDrupalContext extends RawDrupalContext implements SnippetAcceptingCo
         }
       }
 
-    // Login.
-    $this->login();
+      // Login.
+      $this->login();
     }
   }
 
   /**
-  *
-  * @override RawDrupalContext::assertAnonymousUser() with better logged in check.
-  *
-  * @Given I am an anonymous user on this site
-  * @Given I am not logged in on this site
-  */
+   * RawDrupalContext::assertAnonymousUser() with better logged in check.
+   *
+   * @override RawDrupalContext::assertAnonymousUser()
+   *
+   * @Given I am an anonymous user on this site
+   * @Given I am not logged in on this site
+   */
   public function assertAnonymousUserOnThisSite() {
     // Verify the user is logged out.
     if ($this->loggedIn()) {
@@ -101,27 +106,32 @@ class ExtendDrupalContext extends RawDrupalContext implements SnippetAcceptingCo
   }
 
   /**
-  * @Given I am logged in as :name with password :pass
-  */
-  public function assertLoggedInByNameAndPass($name,$pass,$role = 'authenticated user') {
+   * Login user with provided name and password.
+   *
+   * @Given I am logged in as :name with password :pass
+   */
+  public function assertLoggedInByNameAndPass($name, $pass, $role = 'authenticated user') {
 
     $this->user = new \stdClass();
-    //username
+
+    // Username.
     $this->user->name = $name;
-    //pass
+
+    // Pass.
     $this->user->pass = $pass;
 
     // Login.
     $this->login();
   }
 
-
   /**
-  * @Given I am logged in as :name on this site
-  */
+   * Assert user is loggeding with this provided username.
+   *
+   * @Given I am logged in as :name on this site
+   */
   public function assertLoggedInByName($name) {
     if (!isset($this->users[$name])) {
-      throw new \Exception(sprintf('No user with %s name is registered with the driver. %s', $name,print_r($this->user,1)));
+      throw new \Exception(sprintf('No user with %s name is registered with the driver. %s', $name, print_r($this->user, 1)));
     }
 
     // Change internal current user.
@@ -132,7 +142,7 @@ class ExtendDrupalContext extends RawDrupalContext implements SnippetAcceptingCo
   }
 
   /**
-   * Checks if form element is (CSS-)visible
+   * Checks if form element is (CSS-)visible.
    *
    * @Then /^(?:|I )should see the "(?P<label>[^"]*)" form element$/
    */
@@ -141,7 +151,7 @@ class ExtendDrupalContext extends RawDrupalContext implements SnippetAcceptingCo
     $nodes = $element->findAll('css', '.form-item label');
 
     foreach ($nodes as $node) {
-      if (preg_replace("/\s*\*/","",$node->getText()) === $label) {
+      if (preg_replace("/\s*\*/", "", $node->getText()) === $label) {
         if ($node->isVisible()) {
           return;
         }
@@ -151,11 +161,11 @@ class ExtendDrupalContext extends RawDrupalContext implements SnippetAcceptingCo
       }
     }
 
-    throw new \Behat\Mink\Exception\ElementNotFoundException($this->getSession(), 'form item', 'label', $label);
+    throw new ElementNotFoundException($this->getSession(), 'form item', 'label', $label);
   }
 
   /**
-   * Checks if form element is not (CSS-)visible
+   * Checks if form element is not (CSS-)visible.
    *
    * @Then /^(?:|I )should not see the "(?P<label>[^"]*)" form element$/
    */
@@ -165,12 +175,11 @@ class ExtendDrupalContext extends RawDrupalContext implements SnippetAcceptingCo
 
     foreach ($nodes as $node) {
 
-      if (preg_replace("/\s*\*/","",$node->getText()) === $label && $node->isVisible()) {
+      if (preg_replace("/\s*\*/", "", $node->getText()) === $label && $node->isVisible()) {
         throw new \Exception();
       }
     }
 
   }
-
 
 }
